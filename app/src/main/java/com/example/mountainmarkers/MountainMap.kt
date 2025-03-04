@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.mountainmarkers.presentation.MountainsScreenEvent
 import com.example.mountainmarkers.presentation.MountainsScreenViewState
+import com.google.maps.android.compose.GoogleMap
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -46,6 +47,10 @@ fun MountainMap(
     ) {
         // TODO: Add GoogleMap here
 
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            onMapLoaded = { isMapLoaded = true }
+        )
         // TODO: Add cameraPositionState to GoogleMap
 
         // TODO: Add GoogleMap content
