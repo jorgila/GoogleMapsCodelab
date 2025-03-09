@@ -19,6 +19,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.example.mountainmarkers.presentation.AdvancedMarkersMapContent
+import com.example.mountainmarkers.presentation.BasicMarkersMapContent
+import com.example.mountainmarkers.presentation.ClusteringMarkersMapContent
 import com.example.mountainmarkers.presentation.MountainsScreenEvent
 import com.example.mountainmarkers.presentation.MountainsScreenViewState
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -82,11 +85,31 @@ fun MountainMap(
             googleMapOptionsFactory = {
                 GoogleMapOptions().mapId("5498c55c1fa4107")
             },
+        // cameraPositionState to GoogleMap
             cameraPositionState = cameraPositionState
-        )
-        // TODO: Add cameraPositionState to GoogleMap
+        ){
+        // GoogleMap content
+            when (selectedMarkerType) {
+                MarkerType.Basic -> {
+                    BasicMarkersMapContent(
+                        mountains = viewState.mountains,
+                    )
+                }
 
-        // TODO: Add GoogleMap content
+                MarkerType.Advanced -> {
+                    AdvancedMarkersMapContent(
+                        mountains = viewState.mountains,
+                    )
+                }
+
+                MarkerType.Clustered -> {
+                    ClusteringMarkersMapContent(
+                        mountains = viewState.mountains,
+                    )
+                }
+            }
+        }
+
 
         // TODO: Add call to ColoradoPolygon.  Inside the GoogleMap content, but outside of the when
         // statement

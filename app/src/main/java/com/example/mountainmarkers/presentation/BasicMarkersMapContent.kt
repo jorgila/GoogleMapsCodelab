@@ -14,10 +14,22 @@
 
 package com.example.mountainmarkers.presentation
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import com.example.mountainmarkers.R
 import com.example.mountainmarkers.data.local.Mountain
+import com.example.mountainmarkers.data.local.is14er
+import com.example.mountainmarkers.data.utils.toElevationString
 import com.example.mountainmarkers.presentation.MountainsScreenViewState.MountainList
+import com.example.mountainmarkers.presentation.utils.BitmapParameters
+import com.example.mountainmarkers.presentation.utils.vectorToBitmap
 import com.google.android.gms.maps.model.Marker
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberMarkerState
+import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local
 
 /**
  * [GoogleMapComposable] which renders a [MountainList] as a set of basic [Marker]s
@@ -28,7 +40,39 @@ fun BasicMarkersMapContent(
     mountains: List<Mountain>,
     onMountainClick: (Marker) -> Boolean = { false }
 ) {
-    // TODO: Create custom icons for fourteeners and for other mountains
+    // Create custom icons for fourteeners and for other mountains
+    val mountainIcon = vectorToBitmap(
+        LocalContext.current,
+        BitmapParameters(
+            id = R.drawable.baseline_filter_hdr_24,
+            iconColor = MaterialTheme.colorScheme.secondary.toArgb(),
+            backgroundColor = MaterialTheme.colorScheme.secondaryContainer.toArgb()
+        )
+    )
 
-    // TODO: Create Markers from each of the mountains
+    val fourteenerIcon = vectorToBitmap(
+        LocalContext.current,
+        BitmapParameters(
+            id = R.drawable.baseline_filter_hdr_24,
+            iconColor = MaterialTheme.colorScheme.onPrimary.toArgb(),
+            backgroundColor = MaterialTheme.colorScheme.primary.toArgb()
+        )
+    )
+    // Create Markers from each of the mountains
+    mountains.forEach { mountain ->
+        val icon = if(mountain.is14er()) fourteenerIcon else mountainIcon
+        Marker(
+            state = rememberMarkerState(position = mountain.location),
+            title = mountain.name,
+            snippet = mountain.elevation.toElevationString(),
+            tag = mountain,
+            onClick = { marker ->
+                onMountainClick(marker)
+                false
+            },
+            zIndex = if(mountain.is14er()) 5f else 2f,
+            anchor = Offset(0.5f, 0.5f),
+            icon = icon
+        )
+    }
 }
