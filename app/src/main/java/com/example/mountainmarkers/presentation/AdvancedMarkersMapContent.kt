@@ -14,10 +14,23 @@
 
 package com.example.mountainmarkers.presentation
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.toArgb
+import com.example.mountainmarkers.R
+import androidx.compose.ui.platform.LocalContext
 import com.example.mountainmarkers.data.local.Mountain
+import com.example.mountainmarkers.data.local.is14er
+import com.example.mountainmarkers.data.utils.toElevationString
 import com.example.mountainmarkers.presentation.MountainsScreenViewState.MountainList
+import com.example.mountainmarkers.presentation.utils.BitmapParameters
+import com.example.mountainmarkers.presentation.utils.vectorToBitmap
+import com.google.android.gms.maps.model.AdvancedMarker
+import com.google.android.gms.maps.model.AdvancedMarkerOptions
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.PinConfig
+import com.google.maps.android.compose.AdvancedMarker
+import com.google.maps.android.compose.rememberMarkerState
 
 /**
  * [GoogleMapComposable] which renders a [MountainList] as a set of [AdvancedMarker]s
@@ -29,6 +42,49 @@ fun AdvancedMarkersMapContent(
     onMountainClick: (Marker) -> Boolean = { false },
 ) {
     // TODO: Create custom [PinConfig]s for fourteeners and for other mountains
+    val mountainIcon = vectorToBitmap(
+        LocalContext.current,
+        BitmapParameters(
+            id = R.drawable.baseline_filter_hdr_24,
+            iconColor = MaterialTheme.colorScheme.onSecondary.toArgb()
+        )
+    )
+
+    val mountainPin = with(PinConfig.builder()){
+        setGlyph(PinConfig.Glyph(mountainIcon))
+        setBackgroundColor(MaterialTheme.colorScheme.secondary.toArgb())
+        setBorderColor(MaterialTheme.colorScheme.onSecondary.toArgb())
+        build()
+    }
+
+    val fourteenerIcon = vectorToBitmap(
+        LocalContext.current,
+        BitmapParameters(
+            id = R.drawable.baseline_filter_hdr_24,
+            iconColor = MaterialTheme.colorScheme.onPrimary.toArgb()
+        )
+    )
+
+    val fourteenerPin = with(PinConfig.builder()) {
+        setGlyph(PinConfig.Glyph(fourteenerIcon))
+        setBackgroundColor(MaterialTheme.colorScheme.primary.toArgb())
+        setBorderColor(MaterialTheme.colorScheme.onPrimary.toArgb())
+        build()
+    }
 
     // TODO: Create AdvancedMarkers from each of the mountains
+    mountains.forEach{ mountain ->
+        val pin = if(mountain.is14er()) fourteenerPin else mountainPin
+        AdvancedMarker(
+            state = rememberMarkerState(position = mountain.location),
+            title = mountain.name,
+            snippet = mountain.elevation.toElevationString(),
+            collisionBehavior = AdvancedMarkerOptions.CollisionBehavior.REQUIRED_AND_HIDES_OPTIONAL,
+            pinConfig = pin,
+            onClick = { marker ->
+                onMountainClick(marker)
+                false
+            }
+        )
+    }
 }
