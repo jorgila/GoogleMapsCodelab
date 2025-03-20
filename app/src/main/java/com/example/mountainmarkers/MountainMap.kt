@@ -19,6 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import com.example.mountainmarkers.data.utils.DMS
+import com.example.mountainmarkers.data.utils.Direction
+import com.example.mountainmarkers.data.utils.toDecimalDegrees
 import com.example.mountainmarkers.presentation.AdvancedMarkersMapContent
 import com.example.mountainmarkers.presentation.BasicMarkersMapContent
 import com.example.mountainmarkers.presentation.ClusteringMarkersMapContent
@@ -27,9 +31,12 @@ import com.example.mountainmarkers.presentation.MountainsScreenViewState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.GoogleMapComposable
+import com.google.maps.android.compose.Polygon
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -108,14 +115,18 @@ fun MountainMap(
                     )
                 }
             }
+
+            // Call to ColoradoPolygon
+            ColoradoPolygon()
+
+            // TODO: Add code to add KmlLayer.  Inside the GoogleMap content, but outside of the when
+            // statement
+
         }
 
 
-        // TODO: Add call to ColoradoPolygon.  Inside the GoogleMap content, but outside of the when
-        // statement
 
-        // TODO: Add code to add KmlLayer.  Inside the GoogleMap content, but outside of the when
-        // statement
+
 
         // TODO: Add ScaleBar outside of of the GoogleMap content
 
@@ -152,3 +163,27 @@ fun zoomAll(
 }
 
 // TODO: Create ColoradoPolygon function
+
+@Composable
+@GoogleMapComposable
+fun ColoradoPolygon(){
+    val north = 41.0
+    val south = 37.0
+    val east = DMS(Direction.WEST,102.0,3.0).toDecimalDegrees()
+    val west = DMS(Direction.WEST,109.0, 3.0).toDecimalDegrees()
+
+    val locations = listOf(
+        LatLng(north,east),
+        LatLng(south,east),
+        LatLng(south,west),
+        LatLng(north,west)
+    )
+
+    Polygon(
+        points = locations,
+        strokeColor = MaterialTheme.colorScheme.tertiary,
+        strokeWidth = 3F,
+        fillColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f)
+    )
+
+}
